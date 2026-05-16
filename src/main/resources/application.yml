@@ -1,0 +1,115 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: url-shortener
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/url_shortener?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: chetana
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: UrlShortenerHikariCP
+      auto-commit: true
+      connection-test-query: SELECT 1
+      leak-detection-threshold: 60000
+
+  jpa:
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 25
+          batch_versioned_data: true
+          fetch_size: 100
+          time_zone: UTC
+        order_inserts: true
+        order_updates: true
+        default_batch_fetch_size: 100
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      timeout: 60000
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 2
+          max-wait: 3000ms
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000
+      cache-null-values: false
+
+app:
+  jwt:
+    secret: url-shortener-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256
+    refresh-secret: url-shortener-refresh-secret-key-for-token-refresh-2024-secure
+    expiration: 86400000
+
+  url:
+    base-url: http://localhost:8090
+    short-code-length: 7
+
+  cache:
+    url-ttl: 3600
+    redirect-ttl: 1800
+    click-ttl: 300
+
+  qr:
+    cache-ttl: 86400
+    size: 300
+
+  rate-limit:
+    default:
+      capacity: 100
+      window-seconds: 60
+    url-create:
+      capacity: 20
+      window-seconds: 60
+    auth:
+      capacity: 10
+      window-seconds: 60
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    try-it-out-enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+    deep-linking: true
+    default-models-expand-depth: -1
+  packages-to-scan: com.urlshortener.controller
+  show-actuator: false
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
+logging:
+  level:
+    root: INFO
+    com.urlshortener: DEBUG
+    org.springframework.cache: DEBUG
+    org.hibernate.SQL: DEBUG

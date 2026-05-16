@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener - Make Your Links Shorter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <span class="brand-icon"><i class="fas fa-link"></i></span>
+            URL Shortener
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="/"><i class="fas fa-home"></i> Home</a></li>
+            </ul>
+            <ul class="navbar-nav" id="authNav"></ul>
+        </div>
+    </div>
+</nav>
+
+<section class="hero-section text-white text-center">
+    <div class="container position-relative">
+        <h1 class="hero-title">Shorten Your Links</h1>
+        <p class="hero-subtitle mx-auto">Create short, memorable URLs in seconds. Track clicks, analyze visitors, and manage all your links from one dashboard.</p>
+    </div>
+</section>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-cut"></i> Create Short URL
+                </div>
+                <div class="card-body">
+                    <form id="shortenForm">
+                        <div class="mb-3">
+                            <label for="originalUrl" class="form-label">Original URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                <input type="url" class="form-control" id="originalUrl" placeholder="https://example.com/very-long-url" required>
+                            </div>
+                            <div class="invalid-feedback" id="urlError"></div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="customAlias" class="form-label">Custom Alias <small class="text-muted">(optional)</small></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                    <input type="text" class="form-control" id="customAlias" placeholder="my-custom-link" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="expiryDays" class="form-label">Expiry</label>
+                                <select class="form-select" id="expiryDays">
+                                    <option value="1">1 day</option>
+                                    <option value="7">7 days</option>
+                                    <option value="30" selected>30 days</option>
+                                    <option value="90">90 days</option>
+                                    <option value="365">1 year</option>
+                                    <option value="0">Never</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100" id="shortenBtn">
+                                    <i class="fas fa-bolt"></i> Shorten
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div id="shortenLoading" class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p class="text-muted">Creating your short URL...</p>
+                    </div>
+
+                    <div id="urlResult" class="url-result">
+                        <hr>
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <label class="form-label text-muted small">Your short URL is ready!</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg" id="shortUrlOutput" readonly>
+                                    <button class="btn btn-outline-primary" id="copyBtn" onclick="copyShortUrl()">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                    <button class="btn btn-outline-secondary" id="openBtn" onclick="openShortUrl()">
+                                        <i class="fas fa-external-link-alt"></i> Open
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mt-3 mt-md-0">
+                                <div id="qrCodeContainer" class="qr-container">
+                                    <div id="qrImage"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-outline-success" onclick="createAnother()">
+                                <i class="fas fa-plus"></i> Create Another
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5 g-4">
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                <h5>Lightning Fast</h5>
+                <p>Create short URLs instantly with our high-performance backend powered by Redis caching.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                <h5>Detailed Analytics</h5>
+                <p>Track clicks, visitor locations, browsers, referrers, and more with comprehensive analytics.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon"><i class="fas fa-qrcode"></i></div>
+                <h5>QR Code Generator</h5>
+                <p>Every short URL comes with a QR code for easy sharing in print, presentations, and more.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-dark text-white text-center py-4">
+    <p class="mb-1">&copy; 2026 URL Shortener | Developed by Chetana Mahajan using Spring Boot &amp; Bootstrap.</p>
+    <div class="d-flex justify-content-center gap-3">
+        <a href="https://www.linkedin.com/in/chetanamahajan" target="_blank" class="text-white text-decoration-none" title="LinkedIn">
+            <i class="fab fa-linkedin fa-lg"></i> LinkedIn
+        </a>
+        <a href="https://github.com/chetana987" target="_blank" class="text-white text-decoration-none" title="GitHub">
+            <i class="fab fa-github fa-lg"></i> GitHub
+        </a>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app.js"></script>
+<script>
+let lastCreatedShortCode = '';
+
+document.getElementById('shortenForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    Utils.hideError('urlError');
+
+    const url = document.getElementById('originalUrl').value.trim();
+    const alias = document.getElementById('customAlias').value.trim();
+    const expiryDays = parseInt(document.getElementById('expiryDays').value);
+
+    const data = { originalUrl: url };
+    if (alias) data.customAlias = alias;
+    if (expiryDays > 0) data.expiryDays = expiryDays;
+
+    const btn = document.getElementById('shortenBtn');
+    Utils.setLoading(btn, true);
+    document.getElementById('shortenLoading').classList.add('show');
+    document.getElementById('urlResult').classList.remove('show');
+
+    try {
+        const response = await API.createShortUrl(data);
+        const shortUrl = response.data.shortUrl;
+        lastCreatedShortCode = response.data.shortCode;
+
+        document.getElementById('shortUrlOutput').value = shortUrl;
+        Utils.generateQR(response.data.shortCode, 'qrImage');
+        document.getElementById('urlResult').classList.add('show');
+        document.getElementById('shortenLoading').classList.remove('show');
+
+        document.getElementById('openBtn').style.display = API.isAuthenticated() ? '' : 'none';
+
+        Utils.showToast('Short URL created successfully!');
+    } catch (error) {
+        document.getElementById('shortenLoading').classList.remove('show');
+        if (error.status === 429) {
+            Utils.showToast('Rate limit exceeded. Please wait and try again.', 'warning');
+        } else if (error.status === 409) {
+            Utils.showToast(error.message || 'Custom alias already taken', 'error');
+            Utils.showError('urlError', error.message || 'This alias is already in use. Please try another one.');
+        } else {
+            Utils.showToast(error.message || 'Failed to create short URL', 'error');
+            Utils.showError('urlError', error.message || 'Failed to create short URL');
+        }
+    } finally {
+        Utils.setLoading(btn, false);
+    }
+});
+
+function copyShortUrl() {
+    const input = document.getElementById('shortUrlOutput');
+    Utils.copyToClipboard(input.value, document.getElementById('copyBtn'));
+}
+
+function openShortUrl() {
+    const url = document.getElementById('shortUrlOutput').value;
+    if (url) window.open(url, '_blank');
+}
+
+function createAnother() {
+    document.getElementById('shortenForm').reset();
+    document.getElementById('urlResult').classList.remove('show');
+    document.getElementById('shortenLoading').classList.remove('show');
+    document.getElementById('qrImage').innerHTML = '';
+    document.getElementById('originalUrl').focus();
+}
+</script>
+
+</body>
+</html>
