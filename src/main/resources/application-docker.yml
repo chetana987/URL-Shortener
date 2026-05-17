@@ -8,8 +8,8 @@ spring:
     password: ${MYSQL_PASSWORD:root}
     hikari:
       connection-timeout: 30000
-      maximum-pool-size: ${DB_POOL_MAX:10}
-      minimum-idle: 5
+      maximum-pool-size: ${DB_POOL_MAX:5}
+      minimum-idle: 2
       idle-timeout: 600000
       max-lifetime: 1800000
 
@@ -36,9 +36,9 @@ spring:
       timeout: 60000
       lettuce:
         pool:
-          max-active: 10
-          max-idle: 5
-          min-idle: 2
+          max-active: 5
+          max-idle: 2
+          min-idle: 1
           max-wait: 3000ms
 
 app:

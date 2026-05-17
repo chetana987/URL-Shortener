@@ -22,5 +22,8 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
     CMD curl -sf http://localhost:8080/api/v1/health || exit 1
 
 ENTRYPOINT ["java", \
-    "-jar", "app.jar", \
-    "-Djava.security.egd=file:/dev/./urandom"]
+    "-XX:MaxRAMPercentage=75.0", \
+    "-XX:InitialRAMPercentage=50.0", \
+    "-XX:+UseContainerSupport", \
+    "-Djava.security.egd=file:/dev/./urandom", \
+    "-jar", "app.jar"]
