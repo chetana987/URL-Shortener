@@ -104,7 +104,7 @@ public class AuthController {
     @PutMapping(value = "/profile", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<UserResponse>> updateProfile(
             Authentication authentication,
-            @RequestBody UpdateProfileRequest request
+            @Valid @RequestBody UpdateProfileRequest request
     ) {
         String email = authentication.getName();
         log.info("Updating profile for: {}", email);
