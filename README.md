@@ -10,6 +10,7 @@
     <img src="https://img.shields.io/badge/JWT-HS256-000000?style=flat&logo=jsonwebtokens&logoColor=white" alt="JWT HS256">
     <img src="https://img.shields.io/badge/Docker-✓-2496ED?style=flat&logo=docker&logoColor=white" alt="Docker">
     <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat" alt="License">
+    <a href="https://url-shortener-production-a9f6.up.railway.app/app/index.html"><img src="https://img.shields.io/badge/Live Demo-Railway-7C3AED?style=flat&logo=railway&logoColor=white" alt="Live Demo"></a>
   </p>
 
   <br>
@@ -17,6 +18,8 @@
   <p>
     <a href="https://www.linkedin.com/in/chetanamahajan"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
     <a href="https://github.com/chetana987"><img src="https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white" alt="GitHub"></a>
+    <a href="https://url-shortener-production-a9f6.up.railway.app/app/index.html"><img src="https://img.shields.io/badge/▶️ Live Demo-Click Here!-00C853?style=flat" alt="Live Demo"></a>
+  </p>
   </p>
 </div>
 
@@ -44,6 +47,8 @@
 ---
 
 ## 📖 Overview
+
+> **🚀 Live Demo:** [url-shortener-production-a9f6.up.railway.app](https://url-shortener-production-a9f6.up.railway.app/app/index.html)
 
 The **URL Shortener** is a full-stack web application that transforms long URLs into short, manageable links. It provides real-time click analytics, QR code generation, and secure user authentication — all powered by a high-performance Spring Boot backend with Redis caching.
 
