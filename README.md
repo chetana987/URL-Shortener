@@ -40,9 +40,7 @@
 - [Docker Setup](#-docker-setup)
 - [Configuration](#-configuration)
 - [Project Structure](#-project-structure)
-- [Screenshots](#-screenshots)
 - [Future Improvements](#-future-improvements)
-- [Resume Highlights](#-resume-highlights)
 
 ---
 
@@ -827,21 +825,7 @@ url-shortener/
 └── README.md                            # This file
 ```
 
----
 
-## 📸 Screenshots
-
-> **Note**: Add actual screenshots to the `screenshots/` directory and reference them here.
-
-| Page | Screenshot |
-|------|-----------|
-| **Home Page** | URL shortening form with hero section |
-| **Login** | Email/password authentication form |
-| **Dashboard** | Stats cards, URL table with pagination |
-| **Analytics Modal** | Click stats with browser/country/referer breakdown |
-| **Edit Modal** | Update original URL, alias, expiry |
-| **QR Code** | Generated QR code on home page |
-| **Swagger UI** | Interactive API documentation |
 
 ---
 
