@@ -1,365 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ShortLink — Enterprise URL Shortener</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%233B82F6'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='800' font-family='Inter'%3ES%3C/text%3E%3C/svg%3E">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener - Make Your Links Shorter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar" id="mainNav">
+
+<div id="toastContainer" class="toast-container"></div>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-      <a href="/app/index.html" class="nav-brand">
-        <span class="nav-brand-icon">S</span>
-        ShortLink
-      </a>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
-        <span></span><span></span><span></span>
-      </button>
-      <ul class="nav-links" id="authNav">
-      </ul>
+        <a class="navbar-brand" href="/">
+            <span class="brand-icon"><i class="fas fa-link"></i></span>
+            URL Shortener
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="/"><i class="fas fa-home"></i> Home</a></li>
+            </ul>
+            <ul class="navbar-nav" id="authNav"></ul>
+        </div>
     </div>
-  </nav>
+</nav>
 
-  <div class="page-wrapper">
-    <main class="main-content">
-      <section class="hero">
-        <div class="container">
-          <div class="hero-badge">Now in Public Beta</div>
-          <h1>Shorten Links.<br><span class="gradient-text">Track Everything.</span></h1>
-          <p>Enterprise-grade URL shortening with real-time analytics, QR codes, and team collaboration. One platform for all your links.</p>
-        </div>
-      </section>
+<section class="hero-section text-white text-center">
+    <div class="container position-relative">
+        <h1 class="hero-title">Shorten Your Links</h1>
+        <p class="hero-subtitle mx-auto">Create short, memorable URLs in seconds. Track clicks, analyze visitors, and manage all your links from one dashboard.</p>
+    </div>
+</section>
 
-      <div class="shorten-card">
-        <div class="container">
-          <div class="shorten-card-inner">
-            <form id="shortenForm" class="shorten-form">
-              <div class="shorten-input-row">
-                <div class="input-group">
-                  <input type="url" id="originalUrl" class="form-input" placeholder="Enter your long URL here..." required autofocus>
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-cut"></i> Create Short URL
                 </div>
-                <button type="submit" id="shortenBtn" class="btn btn-primary btn-lg">
-                  <span id="shortenBtnText">Shorten</span>
-                  <span id="shortenLoading" class="spinner" style="display:none"></span>
-                </button>
-              </div>
-              <button type="button" class="options-toggle" id="optionsToggle">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-                Advanced Options
-              </button>
-              <div class="shorten-options" id="shortenOptions">
-                <div class="form-group">
-                  <label for="customAlias">Custom Alias</label>
-                  <input type="text" id="customAlias" class="form-input" placeholder="my-custom-link" maxlength="50" pattern="[a-zA-Z0-9\-]+">
+                <div class="card-body">
+                    <form id="shortenForm">
+                        <div class="mb-3">
+                            <label for="originalUrl" class="form-label">Original URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                <input type="url" class="form-control" id="originalUrl" placeholder="https://example.com/very-long-url" required>
+                            </div>
+                            <div class="invalid-feedback" id="urlError"></div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="customAlias" class="form-label">Custom Alias <small class="text-muted">(optional)</small></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                    <input type="text" class="form-control" id="customAlias" placeholder="my-custom-link" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="expiryDays" class="form-label">Expiry</label>
+                                <select class="form-select" id="expiryDays">
+                                    <option value="1">1 day</option>
+                                    <option value="7">7 days</option>
+                                    <option value="30" selected>30 days</option>
+                                    <option value="90">90 days</option>
+                                    <option value="365">1 year</option>
+                                    <option value="0">Never</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100" id="shortenBtn">
+                                    <i class="fas fa-bolt"></i> Shorten
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div id="shortenLoading" class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p class="text-muted">Creating your short URL...</p>
+                    </div>
+
+                    <div id="urlResult" class="url-result">
+                        <hr>
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <label class="form-label text-muted small">Your short URL is ready!</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg" id="shortUrlOutput" readonly>
+                                    <button class="btn btn-outline-primary" id="copyBtn" onclick="copyShortUrl()">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                    <button class="btn btn-outline-secondary" id="openBtn" onclick="openShortUrl()">
+                                        <i class="fas fa-external-link-alt"></i> Open
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mt-3 mt-md-0">
+                                <div id="qrCodeContainer" class="qr-container">
+                                    <div id="qrImage"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-outline-success" onclick="createAnother()">
+                                <i class="fas fa-plus"></i> Create Another
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                  <label for="expiryDays">Expiry (days)</label>
-                  <select id="expiryDays" class="form-input">
-                    <option value="0">Never</option>
-                    <option value="1">1 day</option>
-                    <option value="7">7 days</option>
-                    <option value="30">30 days</option>
-                    <option value="90">90 days</option>
-                    <option value="365">1 year</option>
-                  </select>
-                </div>
-              </div>
-              <div class="url-result" id="urlResult">
-                <div class="url-result-header">
-                  <span class="result-label">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    Link Created Successfully
-                  </span>
-                  <div class="url-result-actions">
-                    <button type="button" class="btn btn-primary btn-sm" id="copyBtn" onclick="copyShortUrl()">Copy</button>
-                    <button type="button" class="btn btn-secondary btn-sm" id="openBtn" onclick="openShortUrl()">Open</button>
-                  </div>
-                </div>
-                <div class="short-url-display">
-                  <span class="short-url-text" id="shortUrlOutput"></span>
-                </div>
-                <div class="qr-container" id="qrCodeContainer" style="display:none">
-                  <img id="qrImage" src="" alt="QR Code">
-                  <div>
-                    <div class="qr-label">Scan to visit</div>
-                  </div>
-                </div>
-                <button type="button" class="btn btn-ghost btn-sm" id="createAnother" onclick="createAnother()" style="margin-top:12px">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  Create another
-                </button>
-              </div>
-              <div class="url-error" id="urlError"></div>
-            </form>
-          </div>
+            </div>
         </div>
-      </div>
+    </div>
 
-      <section class="section" id="features">
-        <div class="container">
-          <div class="section-header">
-            <h2>Everything you need</h2>
-            <p>Powerful features to manage, track, and optimize your links at scale.</p>
-          </div>
-          <div class="features-grid">
-            <div class="feature-card">
-              <div class="feature-icon">🔗</div>
-              <h3>Custom Slugs</h3>
-              <p>Create branded, memorable short links with custom aliases that reflect your brand identity.</p>
+    <div class="row mt-5 g-4">
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                <h5>Lightning Fast</h5>
+                <p>Create short URLs instantly with our high-performance backend powered by Redis caching.</p>
             </div>
-            <div class="feature-card">
-              <div class="feature-icon">📊</div>
-              <h3>Real-time Analytics</h3>
-              <p>Track clicks, unique visitors, browsers, countries, and referrers with detailed real-time dashboards.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">📱</div>
-              <h3>QR Codes</h3>
-              <p>Every short link comes with an auto-generated QR code for print, packaging, and offline campaigns.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">⏱️</div>
-              <h3>Expiration Control</h3>
-              <p>Set automatic expiry on links for time-sensitive campaigns. Never serve stale URLs again.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🔒</div>
-              <h3>Secure & Private</h3>
-              <p>JWT-based authentication, rate limiting, and user-scoped data isolation keep your links secure.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">⚡</div>
-              <h3>Lightning Fast</h3>
-              <p>Powered by Redis caching and optimized redirects. Your links resolve in milliseconds worldwide.</p>
-            </div>
-          </div>
         </div>
-      </section>
-
-      <section class="stats-section section">
-        <div class="container">
-          <div class="stats-grid">
-            <div class="stat-item">
-              <div class="stat-number">10K+</div>
-              <div class="stat-label">Links Created</div>
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                <h5>Detailed Analytics</h5>
+                <p>Track clicks, visitor locations, browsers, referrers, and more with comprehensive analytics.</p>
             </div>
-            <div class="stat-item">
-              <div class="stat-number">1M+</div>
-              <div class="stat-label">Clicks Tracked</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number">99.9%</div>
-              <div class="stat-label">Uptime SLA</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number">50ms</div>
-              <div class="stat-label">Avg. Redirect</div>
-            </div>
-          </div>
         </div>
-      </section>
-
-      <section class="section analytics-preview">
-        <div class="container">
-          <div class="section-header">
-            <h2>Analytics at a glance</h2>
-            <p>Understand how your links perform with detailed metrics and insights.</p>
-          </div>
-          <div class="preview-cards">
-            <div class="preview-card">
-              <div class="preview-label">Total Clicks</div>
-              <div class="preview-value">12,847</div>
-              <div class="preview-trend up">↑ 23% this month</div>
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon"><i class="fas fa-qrcode"></i></div>
+                <h5>QR Code Generator</h5>
+                <p>Every short URL comes with a QR code for easy sharing in print, presentations, and more.</p>
             </div>
-            <div class="preview-card">
-              <div class="preview-label">Unique Visitors</div>
-              <div class="preview-value">8,234</div>
-              <div class="preview-trend up">↑ 18% this month</div>
-            </div>
-            <div class="preview-card">
-              <div class="preview-label">Active Links</div>
-              <div class="preview-value">342</div>
-              <div class="preview-trend up">↑ 12% this month</div>
-            </div>
-            <div class="preview-card">
-              <div class="preview-label">Countries</div>
-              <div class="preview-value">47</div>
-              <div class="preview-trend up">↑ 5 new</div>
-            </div>
-          </div>
         </div>
-      </section>
+    </div>
+</div>
 
-      <section class="trust-section">
-        <div class="container">
-          <p>Trusted by engineering teams worldwide</p>
-          <div class="trust-logos">
-            <span class="trust-logo">ACME Corp</span>
-            <span class="trust-logo">TechFlow</span>
-            <span class="trust-logo">DataPulse</span>
-            <span class="trust-logo">CloudBase</span>
-            <span class="trust-logo">NexGen</span>
-            <span class="trust-logo">ScaleUp</span>
-          </div>
-        </div>
-      </section>
-    </main>
+<footer class="bg-dark text-white text-center py-4">
+    <p class="mb-1">&copy; 2026 URL Shortener | Developed by Chetana Mahajan using Spring Boot &amp; Bootstrap.</p>
+    <div class="d-flex justify-content-center gap-3">
+        <a href="https://www.linkedin.com/in/chetanamahajan" target="_blank" class="text-white text-decoration-none" title="LinkedIn">
+            <i class="fab fa-linkedin fa-lg"></i> LinkedIn
+        </a>
+        <a href="https://github.com/chetana987" target="_blank" class="text-white text-decoration-none" title="GitHub">
+            <i class="fab fa-github fa-lg"></i> GitHub
+        </a>
+    </div>
+</footer>
 
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-grid">
-          <div class="footer-brand">
-            <a href="/app/index.html" class="nav-brand">
-              <span class="nav-brand-icon">S</span>
-              ShortLink
-            </a>
-            <p>Enterprise-grade URL shortening and analytics platform. Built for teams who need reliable link management at scale.</p>
-          </div>
-          <div class="footer-col">
-            <h4>Product</h4>
-            <a href="#features">Features</a>
-            <a href="#">Pricing</a>
-            <a href="#">API</a>
-            <a href="#">Documentation</a>
-          </div>
-          <div class="footer-col">
-            <h4>Company</h4>
-            <a href="#">About</a>
-            <a href="#">Blog</a>
-            <a href="#">Careers</a>
-            <a href="#">Contact</a>
-          </div>
-          <div class="footer-col">
-            <h4>Legal</h4>
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">Security</a>
-            <a href="#">Cookies</a>
-          </div>
-        </div>
-        <div class="footer-bottom">
-          <span>&copy; 2026 ShortLink. All rights reserved.</span>
-          <span>Built with Spring Boot & Redis</span>
-        </div>
-      </div>
-    </footer>
-  </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app.js"></script>
+<script>
+let lastCreatedShortCode = '';
 
-  <div class="toast-container" id="toastContainer"></div>
+document.getElementById('shortenForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    Utils.hideError('urlError');
 
-  <script src="/js/app.js"></script>
-  <script>
-    let lastCreatedShortCode = '';
+    const url = document.getElementById('originalUrl').value.trim();
+    const alias = document.getElementById('customAlias').value.trim();
+    const expiryDays = parseInt(document.getElementById('expiryDays').value);
 
-    const optionsToggle = document.getElementById('optionsToggle');
-    const shortenOptions = document.getElementById('shortenOptions');
-    optionsToggle.addEventListener('click', () => {
-      optionsToggle.classList.toggle('open');
-      shortenOptions.classList.toggle('open');
-    });
+    const data = { originalUrl: url };
+    if (alias) data.customAlias = alias;
+    if (expiryDays > 0) data.expiryDays = expiryDays;
 
-    document.getElementById('shortenForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const originalUrl = document.getElementById('originalUrl').value.trim();
-      const customAlias = document.getElementById('customAlias').value.trim() || undefined;
-      const expiryDays = parseInt(document.getElementById('expiryDays').value) || undefined;
-      const btn = document.getElementById('shortenBtn');
-      const btnText = document.getElementById('shortenBtnText');
-      const loading = document.getElementById('shortenLoading');
-      const urlError = document.getElementById('urlError');
-      const urlResult = document.getElementById('urlResult');
-      const qrContainer = document.getElementById('qrCodeContainer');
+    const btn = document.getElementById('shortenBtn');
+    Utils.setLoading(btn, true);
+    document.getElementById('shortenLoading').classList.add('show');
+    document.getElementById('urlResult').classList.remove('show');
 
-      if (!originalUrl) {
-        urlError.textContent = 'Please enter a URL';
-        urlError.classList.add('visible');
-        return;
-      }
+    try {
+        const response = await API.createShortUrl(data);
+        const shortUrl = response.data.shortUrl;
+        lastCreatedShortCode = response.data.shortCode;
 
-      btn.disabled = true;
-      btnText.textContent = 'Shortening...';
-      loading.style.display = 'inline-block';
-      urlError.classList.remove('visible');
-      urlResult.classList.remove('visible');
-      qrContainer.style.display = 'none';
+        document.getElementById('shortUrlOutput').value = shortUrl;
+        Utils.generateQR(response.data.shortCode, 'qrImage');
+        document.getElementById('urlResult').classList.add('show');
+        document.getElementById('shortenLoading').classList.remove('show');
 
-      try {
-        const data = await API.shortenUrl(originalUrl, customAlias, expiryDays);
-        if (data.success) {
-          lastCreatedShortCode = data.data.shortCode;
-          document.getElementById('shortUrlOutput').textContent = window.location.origin + '/' + data.data.shortCode;
-          document.getElementById('shortUrlOutput').href = window.location.origin + '/' + data.data.shortCode;
+        document.getElementById('openBtn').style.display = API.isAuthenticated() ? '' : 'none';
 
-          if (data.data.qrCode) {
-            document.getElementById('qrImage').src = '/api/v1/qr/' + data.data.shortCode + '?size=200';
-            qrContainer.style.display = 'flex';
-          }
-
-          urlResult.classList.add('visible');
-          document.getElementById('originalUrl').value = '';
-          document.getElementById('customAlias').value = '';
+        Utils.showToast('Short URL created successfully!');
+    } catch (error) {
+        document.getElementById('shortenLoading').classList.remove('show');
+        if (error.status === 429) {
+            Utils.showToast('Rate limit exceeded. Please wait and try again.', 'warning');
+        } else if (error.status === 409) {
+            Utils.showToast(error.message || 'Custom alias already taken', 'error');
+            Utils.showError('urlError', error.message || 'This alias is already in use. Please try another one.');
         } else {
-          urlError.textContent = data.message || 'Failed to shorten URL';
-          urlError.classList.add('visible');
+            Utils.showToast(error.message || 'Failed to create short URL', 'error');
+            Utils.showError('urlError', error.message || 'Failed to create short URL');
         }
-      } catch (err) {
-        urlError.textContent = err.message || 'An error occurred';
-        urlError.classList.add('visible');
-      } finally {
-        btn.disabled = false;
-        btnText.textContent = 'Shorten';
-        loading.style.display = 'none';
-      }
-    });
-
-    function copyShortUrl() {
-      const text = document.getElementById('shortUrlOutput').textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copyBtn');
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = orig; }, 2000);
-      }).catch(() => {
-        Utils.showToast('Failed to copy', 'error');
-      });
+    } finally {
+        Utils.setLoading(btn, false);
     }
+});
 
-    function openShortUrl() {
-      const url = document.getElementById('shortUrlOutput').textContent;
-      window.open(url, '_blank');
-    }
+function copyShortUrl() {
+    const input = document.getElementById('shortUrlOutput');
+    Utils.copyToClipboard(input.value, document.getElementById('copyBtn'));
+}
 
-    function createAnother() {
-      document.getElementById('urlResult').classList.remove('visible');
-      document.getElementById('qrCodeContainer').style.display = 'none';
-      document.getElementById('originalUrl').focus();
-    }
+function openShortUrl() {
+    const url = document.getElementById('shortUrlOutput').value;
+    if (url) window.open(url, '_blank');
+}
 
-    document.getElementById('navToggle').addEventListener('click', function() {
-      this.classList.toggle('active');
-      document.getElementById('authNav').classList.toggle('open');
-    });
+function createAnother() {
+    document.getElementById('shortenForm').reset();
+    document.getElementById('urlResult').classList.remove('show');
+    document.getElementById('shortenLoading').classList.remove('show');
+    document.getElementById('qrImage').innerHTML = '';
+    document.getElementById('originalUrl').focus();
+}
+</script>
 
-    document.querySelectorAll('.nav-links .nav-link').forEach(link => {
-      link.addEventListener('click', () => {
-        document.getElementById('navToggle').classList.remove('active');
-        document.getElementById('authNav').classList.remove('open');
-      });
-    });
-
-    window.addEventListener('scroll', () => {
-      const nav = document.getElementById('mainNav');
-      if (window.scrollY > 50) {
-        nav.classList.add('scrolled');
-      } else {
-        nav.classList.remove('scrolled');
-      }
-    });
-  </script>
 </body>
 </html>

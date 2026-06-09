@@ -1,574 +1,551 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — ShortLink</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%233B82F6'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='800' font-family='Inter'%3ES%3C/text%3E%3C/svg%3E">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - URL Shortener</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar" id="mainNav">
+
+<div id="toastContainer" class="toast-container"></div>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-      <a href="/app/index.html" class="nav-brand">
-        <span class="nav-brand-icon">S</span>
-        ShortLink
-      </a>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
-        <span></span><span></span><span></span>
-      </button>
-      <ul class="nav-links" id="authNav">
-      </ul>
+        <a class="navbar-brand" href="/">
+            <span class="brand-icon"><i class="fas fa-link"></i></span>
+            URL Shortener
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a></li>
+            </ul>
+            <ul class="navbar-nav" id="authNav"></ul>
+        </div>
     </div>
-  </nav>
+</nav>
 
-  <div class="page-wrapper">
-    <main class="main-content">
-      <div class="container dashboard-page">
-        <div class="dashboard-header">
-          <h1>Dashboard</h1>
-          <p>Manage and track all your shortened links</p>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-1">Dashboard</h4>
+            <p class="text-muted mb-0">Manage your short URLs and view analytics</p>
         </div>
-
-        <div class="stats-row" id="statsRow">
-          <div class="stat-card">
-            <div class="stat-icon links">🔗</div>
-            <div class="stat-label">Total Links</div>
-            <div class="stat-value" id="totalUrls">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon active">✓</div>
-            <div class="stat-label">Active</div>
-            <div class="stat-value" id="activeUrls">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon clicks">📈</div>
-            <div class="stat-label">Total Clicks</div>
-            <div class="stat-value" id="totalClicks">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon visitors">👤</div>
-            <div class="stat-label">Unique Visitors</div>
-            <div class="stat-value" id="uniqueVisitors">—</div>
-          </div>
-        </div>
-
-        <div class="dashboard-toolbar">
-          <div class="dashboard-toolbar-left">
-            <div class="filter-tabs">
-              <button class="filter-tab active" data-tab="active" id="tabActive">Active</button>
-              <button class="filter-tab" data-tab="inactive" id="tabInactive">Inactive</button>
-              <button class="filter-tab" data-tab="expired" id="tabExpired">Expired</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="urls-table-container">
-          <div class="loading-spinner" id="urlsLoading">
-            <div class="spinner"></div>
-            <span>Loading your links...</span>
-          </div>
-          <div id="urlsTableContainer" style="display:none">
-            <table class="urls-table">
-              <thead>
-                <tr>
-                  <th>Original URL</th>
-                  <th>Short Link</th>
-                  <th>Clicks</th>
-                  <th>Status</th>
-                  <th>Created</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="urlsTableBody"></tbody>
-            </table>
-          </div>
-          <div class="empty-state" id="emptyState" style="display:none">
-            <div class="empty-icon">🔗</div>
-            <h3>No links yet</h3>
-            <p>Create your first shortened link to get started</p>
-            <a href="/app/index.html" class="btn btn-primary">Create your first link</a>
-          </div>
-          <div id="paginationContainer" style="display:none">
-            <div class="pagination" id="pagination"></div>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <div class="modal-overlay" id="editUrlModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>Edit Link</h2>
-        <button class="modal-close" onclick="closeEditModal()">&times;</button>
-      </div>
-      <form id="editUrlForm">
-        <div class="modal-body">
-          <input type="hidden" id="editShortCode">
-          <div class="form-group" style="margin-bottom:16px">
-            <label for="editOriginalUrl">Original URL</label>
-            <input type="url" id="editOriginalUrl" class="form-input" required>
-          </div>
-          <div class="form-group" style="margin-bottom:16px">
-            <label for="editCustomAlias">Custom Alias</label>
-            <input type="text" id="editCustomAlias" class="form-input" maxlength="50" pattern="[a-zA-Z0-9\-]+">
-          </div>
-          <div class="form-group" style="margin-bottom:16px">
-            <label for="editExpiryDays">Expiry (days)</label>
-            <select id="editExpiryDays" class="form-input">
-              <option value="0">Never</option>
-              <option value="1">1 day</option>
-              <option value="7">7 days</option>
-              <option value="30">30 days</option>
-              <option value="90">90 days</option>
-              <option value="365">1 year</option>
-            </select>
-          </div>
-          <div class="auth-error" id="editUrlError"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-          <button type="submit" id="editUrlBtn" class="btn btn-primary">Save Changes</button>
-        </div>
-      </form>
+        <a href="/app/index.html" class="btn btn-primary"><i class="fas fa-plus"></i> New URL</a>
     </div>
-  </div>
 
-  <div class="modal-overlay" id="analyticsModal">
-    <div class="modal modal-lg">
-      <div class="modal-header">
-        <h2>Link Analytics</h2>
-        <button class="modal-close" onclick="closeAnalyticsModal()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="analyticsShortCode">
-        <div class="loading-spinner" id="analyticsLoading">
-          <div class="spinner"></div>
-          <span>Loading analytics...</span>
+    <div class="row dashboard-stats g-3 mb-4" id="statsRow">
+        <div class="col-6 col-md-3">
+            <div class="stat-card" style="border-left-color:#6c5ce7;">
+                <div class="stat-icon" style="background:#6c5ce7;"><i class="fas fa-link"></i></div>
+                <div class="stat-value" id="totalUrls">—</div>
+                <div class="stat-label">Total URLs</div>
+            </div>
         </div>
-        <div id="analyticsContent" style="display:none">
-          <div class="analytics-grid">
-            <div class="analytics-item">
-              <div class="analytics-label">Total Clicks</div>
-              <div class="analytics-value" id="analyticsTotalClicks">—</div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card" style="border-left-color:#00cec9;">
+                <div class="stat-icon" style="background:#00cec9;"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value" id="activeUrls">—</div>
+                <div class="stat-label">Active</div>
             </div>
-            <div class="analytics-item">
-              <div class="analytics-label">Unique Visitors</div>
-              <div class="analytics-value" id="analyticsUniqueVisitors">—</div>
-            </div>
-            <div class="analytics-item">
-              <div class="analytics-label">First Click</div>
-              <div class="analytics-value" id="analyticsFirstClick">—</div>
-            </div>
-            <div class="analytics-item">
-              <div class="analytics-label">Last Click</div>
-              <div class="analytics-value" id="analyticsLastClick">—</div>
-            </div>
-          </div>
-
-          <div class="tabs-container" id="analyticsTabs">
-            <button class="tab-btn active" data-tab="browsers">Browsers</button>
-            <button class="tab-btn" data-tab="countries">Countries</button>
-            <button class="tab-btn" data-tab="referers">Referrers</button>
-            <button class="tab-btn" data-tab="daily">Daily</button>
-            <button class="tab-btn" data-tab="clicks">Recent Clicks</button>
-          </div>
-
-          <div class="analytics-section">
-            <div id="browsersContent"></div>
-            <div id="countriesContent" style="display:none"></div>
-            <div id="referersContent" style="display:none"></div>
-            <div id="dailyContent" style="display:none"></div>
-            <div id="recentClicksBody" style="display:none"></div>
-          </div>
         </div>
-      </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card" style="border-left-color:#fd79a8;">
+                <div class="stat-icon" style="background:#fd79a8;"><i class="fas fa-mouse-pointer"></i></div>
+                <div class="stat-value" id="totalClicks">—</div>
+                <div class="stat-label">Total Clicks</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card" style="border-left-color:#fdcb6e;">
+                <div class="stat-icon" style="background:#fdcb6e;"><i class="fas fa-users"></i></div>
+                <div class="stat-value" id="uniqueVisitors">—</div>
+                <div class="stat-label">Unique Visitors</div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="toast-container" id="toastContainer"></div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-list"></i> Your URLs</span>
+            <div class="btn-group btn-group-sm">
+                <button class="btn btn-light active" id="tabActive" onclick="switchTab('active')">Active</button>
+                <button class="btn btn-light" id="tabInactive" onclick="switchTab('inactive')">Inactive</button>
+                <button class="btn btn-light" id="tabExpired" onclick="switchTab('expired')">Expired</button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div id="urlsLoading" class="loading-spinner show">
+                <div class="spinner"></div>
+                <p class="text-muted">Loading URLs...</p>
+            </div>
+            <div class="table-responsive" id="urlsTableContainer" style="display:none;">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr><th>Short URL</th><th>Original URL</th><th>Clicks</th><th>Created</th><th>Expires</th><th>Status</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="urlsTableBody"></tbody>
+                </table>
+            </div>
+            <div id="emptyState" class="text-center py-5" style="display:none;">
+                <i class="fas fa-link" style="font-size:3rem;color:#ddd;"></i>
+                <h5 class="mt-3 text-muted">No URLs yet</h5>
+                <p class="text-muted">Create your first short URL to get started.</p>
+                <a href="/app/index.html" class="btn btn-primary"><i class="fas fa-plus"></i> Create URL</a>
+            </div>
+            <div id="paginationContainer" class="d-flex justify-content-center p-3" style="display:none;">
+                <nav><ul class="pagination" id="pagination"></ul></nav>
+            </div>
+        </div>
+    </div>
 
-  <script src="/js/app.js"></script>
-  <script>
-    let currentTab = 'active';
-    let currentPage = 0;
+    <div class="modal fade" id="editUrlModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background:var(--gradient);color:white;">
+                    <h5 class="modal-title"><i class="fas fa-edit"></i> Edit URL</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUrlForm">
+                        <input type="hidden" id="editShortCode">
+                        <div class="mb-3">
+                            <label for="editOriginalUrl" class="form-label">Original URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                <input type="url" class="form-control" id="editOriginalUrl" required>
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="editCustomAlias" class="form-label">Custom Alias <small class="text-muted">(optional)</small></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                    <input type="text" class="form-control" id="editCustomAlias" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editExpiryDays" class="form-label">Extend Expiry</label>
+                                <select class="form-select" id="editExpiryDays">
+                                    <option value="0">Keep current</option>
+                                    <option value="7">+7 days</option>
+                                    <option value="30" selected>+30 days</option>
+                                    <option value="90">+90 days</option>
+                                    <option value="365">+1 year</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="alert alert-danger d-none" id="editUrlError"></div>
+                        <button type="submit" class="btn btn-primary w-100" id="editUrlBtn">
+                            <i class="fas fa-save"></i> Update URL
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    document.addEventListener('DOMContentLoaded', function() {
-      if (!localStorage.getItem('token')) {
-        window.location.href = '/app/login.html';
-        return;
-      }
-      loadDashboardData();
-    });
+    <div class="modal fade" id="analyticsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background:var(--gradient);color:white;">
+                    <h5 class="modal-title"><i class="fas fa-chart-bar"></i> Analytics: <span id="analyticsShortCode"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="analyticsLoading" class="loading-spinner show">
+                        <div class="spinner"></div>
+                        <p class="text-muted">Loading analytics...</p>
+                    </div>
+                    <div id="analyticsContent" style="display:none;">
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card p-3 text-center" style="border-left:none;">
+                                    <div class="stat-value small" id="analyticsTotalClicks">0</div>
+                                    <div class="stat-label small">Total Clicks</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card p-3 text-center" style="border-left:none;">
+                                    <div class="stat-value small" id="analyticsUniqueVisitors">0</div>
+                                    <div class="stat-label small">Unique Visitors</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card p-3 text-center" style="border-left:none;">
+                                    <div class="stat-value small" id="analyticsFirstClick">—</div>
+                                    <div class="stat-label small">First Click</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card p-3 text-center" style="border-left:none;">
+                                    <div class="stat-value small" id="analyticsLastClick">—</div>
+                                    <div class="stat-label small">Last Click</div>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="nav nav-tabs mb-3" id="analyticsTabs">
+                            <li class="nav-item"><a class="nav-link active" href="#browsers" data-bs-toggle="tab">Browsers</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#countries" data-bs-toggle="tab">Countries</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#referers" data-bs-toggle="tab">Referers</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#daily" data-bs-toggle="tab">Daily</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="browsers"><div id="browsersContent"></div></div>
+                            <div class="tab-pane" id="countries"><div id="countriesContent"></div></div>
+                            <div class="tab-pane" id="referers"><div id="referersContent"></div></div>
+                            <div class="tab-pane" id="daily"><div id="dailyContent"></div></div>
+                        </div>
+                        <hr>
+                        <h6 class="fw-bold mb-3">Recent Clicks</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead><tr><th>Time</th><th>IP</th><th>Country</th><th>Browser</th><th>Referer</th></tr></thead>
+                                <tbody id="recentClicksBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    document.addEventListener('click', function(e) {
-      var tabBtn = e.target.closest('[data-tab]');
-      if (tabBtn && tabBtn.closest('#analyticsTabs')) {
-        var tabName = tabBtn.dataset.tab;
-        document.querySelectorAll('#analyticsTabs .tab-btn').forEach(function(t) {
-          t.classList.remove('active');
+<footer class="bg-dark text-white text-center py-3 mt-4">
+    <p class="mb-1 small">&copy; 2026 URL Shortener | Developed by Chetana Mahajan using Spring Boot &amp; Bootstrap.</p>
+    <div class="d-flex justify-content-center gap-3 small">
+        <a href="https://www.linkedin.com/in/chetanamahajan" target="_blank" class="text-white text-decoration-none" title="LinkedIn">
+            <i class="fab fa-linkedin fa-lg"></i> LinkedIn
+        </a>
+        <a href="https://github.com/chetana987" target="_blank" class="text-white text-decoration-none" title="GitHub">
+            <i class="fab fa-github fa-lg"></i> GitHub
+        </a>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app.js"></script>
+<script>
+let currentTab = 'active';
+let currentPage = 0;
+let analyticsModalInstance = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadUrls();
+    const modalEl = document.getElementById('analyticsModal');
+    if (modalEl) {
+        analyticsModalInstance = new bootstrap.Modal(modalEl);
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            document.getElementById('analyticsContent').style.display = 'none';
+            document.getElementById('analyticsLoading').classList.add('show');
         });
-        tabBtn.classList.add('active');
-        var contents = ['browsersContent', 'countriesContent', 'referersContent', 'dailyContent', 'recentClicksBody'];
-        contents.forEach(function(id) {
-          var el = document.getElementById(id);
-          if (el) el.style.display = 'none';
+    }
+    const editModalEl = document.getElementById('editUrlModal');
+    if (editModalEl) {
+        editModalInstance = new bootstrap.Modal(editModalEl);
+        editModalEl.addEventListener('hidden.bs.modal', () => {
+            document.getElementById('editUrlError').classList.add('d-none');
         });
-        var target = document.getElementById(tabName + 'Content') || document.getElementById(tabName === 'clicks' ? 'recentClicksBody' : '');
-        if (target) target.style.display = 'block';
-      }
-    });
-
-    async function loadDashboardData() {
-      await loadDashboardStats();
-      await loadUrls();
     }
+});
 
-    document.getElementById('navToggle').addEventListener('click', function() {
-      this.classList.toggle('active');
-      document.getElementById('authNav').classList.toggle('open');
-    });
-
-    window.addEventListener('scroll', function() {
-      var nav = document.getElementById('mainNav');
-      if (window.scrollY > 50) {
-        nav.classList.add('scrolled');
-      } else {
-        nav.classList.remove('scrolled');
-      }
-    });
-
-    async function loadDashboardStats() {
-      try {
-        var response = await API.getUrls(0, 100);
-        var allUrls = response.data && response.data.content ? response.data.content : [];
-        var activeCount = allUrls.filter(function(u) { return u.active && !u.expired && !u.isExpired; }).length;
-        var totalClicks = allUrls.reduce(function(s, u) { return s + (u.clickCount || 0); }, 0);
-        document.getElementById('totalUrls').textContent = allUrls.length;
-        document.getElementById('activeUrls').textContent = activeCount;
-        document.getElementById('totalClicks').textContent = totalClicks.toLocaleString();
-        var uniqueTotal = 0;
-        var batchSize = 5;
-        for (var i = 0; i < allUrls.length; i += batchSize) {
-          var batch = allUrls.slice(i, i + batchSize);
-          var results = await Promise.allSettled(batch.map(function(u) { return API.getUniqueVisitors(u.shortCode); }));
-          results.forEach(function(r) {
-            if (r.status === 'fulfilled' && r.value && r.value.data != null) {
-              uniqueTotal += Number(r.value.data);
-            }
-          });
-        }
-        document.getElementById('uniqueVisitors').textContent = uniqueTotal > 0 ? uniqueTotal.toLocaleString() : '—';
-      } catch (err) {
-        console.error('Failed to load stats:', err);
-      }
-    }
-
-    async function loadUrls() {
-      var loading = document.getElementById('urlsLoading');
-      var tableContainer = document.getElementById('urlsTableContainer');
-      var emptyState = document.getElementById('emptyState');
-      var paginationContainer = document.getElementById('paginationContainer');
-      loading.style.display = 'flex';
-      tableContainer.style.display = 'none';
-      emptyState.style.display = 'none';
-      paginationContainer.style.display = 'none';
-      try {
-        var response;
+async function loadUrls() {
+    const loading = document.getElementById('urlsLoading');
+    const tableContainer = document.getElementById('urlsTableContainer');
+    const emptyState = document.getElementById('emptyState');
+    const paginationContainer = document.getElementById('paginationContainer');
+    loading.classList.add('show');
+    tableContainer.style.display = 'none';
+    emptyState.style.display = 'none';
+    paginationContainer.style.display = 'none';
+    try {
+        let response;
         switch (currentTab) {
-          case 'inactive': response = await API.getInactiveUrls(currentPage); break;
-          case 'expired': response = await API.getExpiredUrls(currentPage); break;
-          default: response = await API.getUrls(currentPage);
+            case 'inactive': response = await API.getInactiveUrls(currentPage); break;
+            case 'expired': response = await API.getExpiredUrls(currentPage); break;
+            default: response = await API.getUrls(currentPage);
         }
-        loading.style.display = 'none';
+        loading.classList.remove('show');
         if (response.data && response.data.content && response.data.content.length > 0) {
-          renderUrls(response.data.content);
-          renderPagination(response.data);
-          tableContainer.style.display = 'block';
-          paginationContainer.style.display = 'block';
+            renderUrls(response.data.content);
+            renderPagination(response.data);
+            tableContainer.style.display = '';
+            paginationContainer.style.display = '';
+            updateStats(response.data.content);
+            loadUniqueVisitors(response.data.content);
         } else {
-          emptyState.style.display = 'block';
+            emptyState.style.display = '';
         }
-      } catch (error) {
-        loading.style.display = 'none';
+    } catch (error) {
+        loading.classList.remove('show');
         if (error.status === 401) {
-          API.clearToken();
-          window.location.href = '/app/login.html?redirect=dashboard.html';
-          return;
+            API.clearToken();
+            window.location.href = '/app/login.html?redirect=dashboard.html';
+            return;
         }
         if (error.status === 429) {
-          Utils.showToast('Rate limit exceeded. Please wait and refresh.', 'warning');
+            Utils.showToast('Rate limit exceeded. Please wait and refresh.', 'warning');
         }
         Utils.showToast(error.message || 'Failed to load URLs', 'error');
-        emptyState.innerHTML = '<div class="empty-icon">⚠</div><h3>Failed to load URLs</h3><p>' + (error.message || 'Please try again later.') + '</p><button class="btn btn-primary" onclick="loadUrls()">Retry</button>';
-        emptyState.style.display = 'block';
-      }
+        emptyState.innerHTML = `
+            <i class="fas fa-exclamation-triangle" style="font-size:3rem;color:#fd79a8;"></i>
+            <h5 class="mt-3 text-muted">Failed to load URLs</h5>
+            <p class="text-muted">${error.message || 'Please try again later.'}</p>
+            <button class="btn btn-primary" onclick="loadUrls()"><i class="fas fa-sync"></i> Retry</button>`;
+        emptyState.style.display = '';
     }
+}
 
-    function renderUrls(urls) {
-      var tbody = document.getElementById('urlsTableBody');
-      tbody.innerHTML = '';
-      urls.forEach(function(url) {
-        var statusBadge, statusClass;
+function renderUrls(urls) {
+    const tbody = document.getElementById('urlsTableBody');
+    tbody.innerHTML = '';
+    urls.forEach(url => {
+        let statusBadge, statusClass;
         if (url.expired || url.isExpired) { statusBadge = 'Expired'; statusClass = 'badge-expired'; }
         else if (!url.active) { statusBadge = 'Inactive'; statusClass = 'badge-inactive'; }
         else { statusBadge = 'Active'; statusClass = 'badge-active'; }
-        var tr = document.createElement('tr');
-        var actionsHtml = '';
-        if (url.active && !url.expired && !url.isExpired) {
-          actionsHtml = '<button class="btn btn-ghost btn-sm" onclick="copyUrl(\'' + url.shortUrl + '\')" title="Copy">Copy</button>'
-            + '<button class="btn btn-ghost btn-sm" onclick="showAnalytics(\'' + url.shortCode + '\')" title="Analytics">Stats</button>'
-            + '<button class="btn btn-ghost btn-sm" onclick="showEditModal(\'' + url.shortCode + '\')" title="Edit">Edit</button>'
-            + '<button class="btn btn-ghost btn-sm" onclick="extendExpiry(\'' + url.shortCode + '\')" title="Extend">Extend</button>'
-            + '<button class="btn btn-ghost btn-sm" style="color:var(--accent-danger)" onclick="deactivateUrl(\'' + url.shortCode + '\')" title="Deactivate">Deact</button>';
-        } else if (!url.expired && !url.isExpired) {
-          actionsHtml = '<button class="btn btn-ghost btn-sm" onclick="showAnalytics(\'' + url.shortCode + '\')" title="Analytics">Stats</button>'
-            + '<button class="btn btn-ghost btn-sm" style="color:var(--accent-success)" onclick="activateUrl(\'' + url.shortCode + '\')" title="Activate">Activate</button>';
-        }
-        tr.innerHTML = '<td class="url-cell" title="' + url.originalUrl + '"><a href="' + url.originalUrl + '" target="_blank">' + url.originalUrl + '</a></td>'
-          + '<td class="short-cell"><a href="' + url.shortUrl + '" target="_blank">' + url.shortCode + '</a></td>'
-          + '<td>' + (url.clickCount || 0) + '</td>'
-          + '<td><span class="badge ' + statusClass + '">' + statusBadge + '</span></td>'
-          + '<td style="font-size:12px;color:var(--text-secondary)">' + Utils.timeAgo(url.createdAt) + '</td>'
-          + '<td><div class="actions-cell">' + actionsHtml + '</div></td>';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                <a href="${url.shortUrl}" target="_blank" class="text-decoration-none fw-semibold" style="color:var(--primary);">${url.shortCode}</a>
+                <br><small class="text-muted">${url.shortUrl}</small>
+            </td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${url.originalUrl}">${url.originalUrl}</td>
+            <td><span class="fw-bold">${url.clickCount || 0}</span></td>
+            <td><small>${Utils.timeAgo(url.createdAt)}</small></td>
+            <td><small>${url.expiryDate ? Utils.formatDate(url.expiryDate) : 'Never'}</small></td>
+            <td><span class="badge ${statusClass}">${statusBadge}</span></td>
+            <td>
+                <div class="btn-group btn-group-sm">
+                    ${url.active && !url.expired && !url.isExpired ? `
+                        <button class="btn btn-outline-primary" onclick="copyUrl('${url.shortUrl}')" title="Copy"><i class="fas fa-copy"></i></button>
+                        <button class="btn btn-outline-info" onclick="showAnalytics('${url.shortCode}')" title="Analytics"><i class="fas fa-chart-bar"></i></button>
+                        <button class="btn btn-outline-warning" onclick="showEditModal('${url.shortCode}')" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-outline-secondary" onclick="extendExpiry('${url.shortCode}')" title="Extend"><i class="fas fa-clock"></i></button>
+                        <button class="btn btn-outline-danger" onclick="deactivateUrl('${url.shortCode}')" title="Deactivate"><i class="fas fa-ban"></i></button>
+                    ` : !url.expired && !url.isExpired ? `
+                        <button class="btn btn-outline-info" onclick="showAnalytics('${url.shortCode}')" title="Analytics"><i class="fas fa-chart-bar"></i></button>
+                        <button class="btn btn-outline-success" onclick="activateUrl('${url.shortCode}')" title="Activate"><i class="fas fa-play"></i></button>
+                    ` : ''}
+                </div>
+            </td>`;
         tbody.appendChild(tr);
-      });
-    }
-
-    function renderPagination(pageData) {
-      var pagination = document.getElementById('pagination');
-      var container = document.getElementById('paginationContainer');
-      pagination.innerHTML = '';
-      var totalPages = pageData.totalPages || 1;
-      var current = pageData.number || 0;
-      if (totalPages <= 1) { container.style.display = 'none'; return; }
-      container.style.display = 'block';
-      var prevBtn = document.createElement('button');
-      prevBtn.textContent = '←';
-      prevBtn.disabled = current === 0;
-      prevBtn.onclick = function() { goToPage(current - 1); };
-      pagination.appendChild(prevBtn);
-      for (var i = Math.max(0, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
-        var btn = document.createElement('button');
-        btn.textContent = i + 1;
-        if (i === current) btn.className = 'active';
-        btn.onclick = (function(p) { return function() { goToPage(p); }; })(i);
-        pagination.appendChild(btn);
-      }
-      var nextBtn = document.createElement('button');
-      nextBtn.textContent = '→';
-      nextBtn.disabled = current >= totalPages - 1;
-      nextBtn.onclick = function() { goToPage(current + 1); };
-      pagination.appendChild(nextBtn);
-    }
-
-    function goToPage(page) { currentPage = page; loadUrls(); }
-
-    function switchTab(tab) {
-      currentTab = tab;
-      currentPage = 0;
-      document.querySelectorAll('.filter-tab').forEach(function(el) { el.classList.remove('active'); });
-      var tabMap = { active: 'tabActive', inactive: 'tabInactive', expired: 'tabExpired' };
-      document.getElementById(tabMap[tab]).classList.add('active');
-      loadUrls();
-    }
-
-    document.querySelectorAll('.filter-tab').forEach(function(tab) {
-      tab.addEventListener('click', function() { switchTab(this.dataset.tab); });
     });
+}
 
-    function copyUrl(url) {
-      navigator.clipboard.writeText(url).then(function() {
-        Utils.showToast('Copied to clipboard', 'success');
-      }).catch(function() {
-        Utils.showToast('Failed to copy', 'error');
-      });
+function updateStats(urls) {
+    document.getElementById('totalUrls').textContent = urls.length;
+    document.getElementById('activeUrls').textContent = urls.filter(u => u.active && !u.expired && !u.isExpired).length;
+    document.getElementById('totalClicks').textContent = urls.reduce((s, u) => s + (u.clickCount || 0), 0);
+}
+
+async function loadUniqueVisitors(urls) {
+    let total = 0;
+    let loaded = 0;
+    const batchSize = 5;
+    for (let i = 0; i < urls.length; i += batchSize) {
+        const batch = urls.slice(i, i + batchSize);
+        const results = await Promise.allSettled(
+            batch.map(u => API.getUniqueVisitors(u.shortCode))
+        );
+        results.forEach(r => {
+            if (r.status === 'fulfilled' && r.value?.data != null) {
+                total += Number(r.value.data);
+                loaded++;
+            }
+        });
     }
+    document.getElementById('uniqueVisitors').textContent = loaded > 0 ? total.toLocaleString() : '—';
+}
 
-    async function deactivateUrl(shortCode) {
-      if (!confirm('Deactivate this URL? It will stop working.')) return;
-      try { await API.deactivateUrl(shortCode); Utils.showToast('URL deactivated', 'success'); loadUrls(); }
-      catch (error) { Utils.showToast(error.message || 'Failed to deactivate', 'error'); }
+function renderPagination(pageData) {
+    const ul = document.getElementById('pagination');
+    ul.innerHTML = '';
+    const totalPages = pageData.totalPages || 1;
+    const current = pageData.number || 0;
+    if (totalPages <= 1) { document.getElementById('paginationContainer').style.display = 'none'; return; }
+    document.getElementById('paginationContainer').style.display = '';
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${current === 0 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${current - 1})"><i class="fas fa-chevron-left"></i></a>`;
+    ul.appendChild(prevLi);
+    for (let i = Math.max(0, current - 2); i <= Math.min(totalPages - 1, current + 2); i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === current ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${i})">${i + 1}</a>`;
+        ul.appendChild(li);
     }
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${current >= totalPages - 1 ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${current + 1})"><i class="fas fa-chevron-right"></i></a>`;
+    ul.appendChild(nextLi);
+}
 
-    async function activateUrl(shortCode) {
-      try { await API.activateUrl(shortCode); Utils.showToast('URL activated', 'success'); loadUrls(); }
-      catch (error) { Utils.showToast(error.message || 'Failed to activate', 'error'); }
+function goToPage(page) { currentPage = page; loadUrls(); }
+function switchTab(tab) {
+    currentTab = tab; currentPage = 0;
+    document.querySelectorAll('[id^="tab"]').forEach(el => el.classList.remove('active'));
+    document.getElementById({ active: 'tabActive', inactive: 'tabInactive', expired: 'tabExpired' }[tab]).classList.add('active');
+    loadUrls();
+}
+function copyUrl(url) { Utils.copyToClipboard(url, document.querySelector(`[onclick="copyUrl('${url}')"]`)); }
+
+async function deactivateUrl(shortCode) {
+    if (!confirm('Deactivate this URL? It will stop working.')) return;
+    try { await API.deactivateUrl(shortCode); Utils.showToast('URL deactivated'); loadUrls(); }
+    catch (error) { Utils.showToast(error.message || 'Failed to deactivate', 'error'); }
+}
+async function activateUrl(shortCode) {
+    try { await API.activateUrl(shortCode); Utils.showToast('URL activated'); loadUrls(); }
+    catch (error) { Utils.showToast(error.message || 'Failed to activate', 'error'); }
+}
+async function extendExpiry(shortCode) {
+    const days = prompt('Extend by how many days?', '30');
+    if (!days || isNaN(days) || parseInt(days) < 1) return;
+    try { await API.extendExpiration(shortCode, parseInt(days)); Utils.showToast(`Expiration extended by ${days} days`); loadUrls(); }
+    catch (error) { Utils.showToast(error.message || 'Failed to extend', 'error'); }
+}
+
+async function showAnalytics(shortCode) {
+    document.getElementById('analyticsShortCode').textContent = shortCode;
+    document.getElementById('analyticsLoading').classList.add('show');
+    document.getElementById('analyticsContent').style.display = 'none';
+    analyticsModalInstance?.show();
+    try {
+        const [stats, clicks] = await Promise.all([
+            API.getUrlStats(shortCode),
+            API.getClickHistory(shortCode, 0, 10)
+        ]);
+        document.getElementById('analyticsTotalClicks').textContent = stats.data.totalClicks || 0;
+        document.getElementById('analyticsUniqueVisitors').textContent = stats.data.uniqueVisitors || 0;
+        document.getElementById('analyticsFirstClick').textContent = stats.data.firstClick ? Utils.formatDate(stats.data.firstClick) : '—';
+        document.getElementById('analyticsLastClick').textContent = stats.data.lastClick ? Utils.timeAgo(stats.data.lastClick) : '—';
+        renderStatTable('browsersContent', stats.data.browsers);
+        renderStatTable('countriesContent', stats.data.countries);
+        renderStatTable('referersContent', stats.data.referers);
+        renderDailyContent('dailyContent', stats.data.dailyDistribution);
+        renderRecentClicks(clicks.data?.content || []);
+        document.getElementById('analyticsLoading').classList.remove('show');
+        document.getElementById('analyticsContent').style.display = '';
+    } catch (error) {
+        document.getElementById('analyticsLoading').classList.remove('show');
+        document.getElementById('analyticsContent').innerHTML = `<div class="alert alert-danger">Failed to load analytics: ${error.message}</div>`;
+        document.getElementById('analyticsContent').style.display = '';
     }
+}
 
-    async function extendExpiry(shortCode) {
-      var days = prompt('Extend by how many days?', '30');
-      if (!days || isNaN(days) || parseInt(days) < 1) return;
-      try { await API.extendExpiration(shortCode, parseInt(days)); Utils.showToast('Expiration extended by ' + days + ' days', 'success'); loadUrls(); }
-      catch (error) { Utils.showToast(error.message || 'Failed to extend', 'error'); }
-    }
+function renderStatTable(containerId, entries) {
+    const container = document.getElementById(containerId);
+    if (!entries || entries.length === 0) { container.innerHTML = '<p class="text-muted text-center py-3">No data available</p>'; return; }
+    const max = Math.max(...entries.map(e => e.count));
+    let html = '<div class="list-group list-group-flush">';
+    entries.slice(0, 10).forEach(entry => {
+        const pct = max > 0 ? (entry.count / max * 100) : 0;
+        html += `<div class="list-group-item d-flex justify-content-between align-items-center px-0">
+            <div class="flex-grow-1 me-3">
+                <div class="d-flex justify-content-between">
+                    <small class="fw-semibold">${entry.name || 'Unknown'}</small>
+                    <small class="text-muted">${entry.count.toLocaleString()} (${(entry.percentage || 0).toFixed(1)}%)</small>
+                </div>
+                <div class="progress mt-1" style="height:4px;"><div class="progress-bar" style="width:${pct}%;background:var(--gradient);"></div></div>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
 
-    function closeEditModal() { document.getElementById('editUrlModal').classList.remove('visible'); }
-    function closeAnalyticsModal() { document.getElementById('analyticsModal').classList.remove('visible'); }
+function renderDailyContent(containerId, entries) {
+    const container = document.getElementById(containerId);
+    if (!entries || entries.length === 0) { container.innerHTML = '<p class="text-muted text-center py-3">No daily data available</p>'; return; }
+    const max = Math.max(...entries.map(e => e.clicks));
+    let html = '<div class="list-group list-group-flush">';
+    entries.slice(-30).forEach(entry => {
+        const pct = max > 0 ? (entry.clicks / max * 100) : 0;
+        html += `<div class="list-group-item d-flex justify-content-between align-items-center px-0">
+            <small class="text-muted" style="min-width:100px;">${Utils.formatDate(entry.date)}</small>
+            <div class="flex-grow-1 mx-3"><div class="progress" style="height:6px;"><div class="progress-bar" style="width:${pct}%;background:var(--secondary);"></div></div></div>
+            <small class="fw-bold">${entry.clicks}</small>
+        </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
 
-    async function showEditModal(shortCode) {
-      var errorEl = document.getElementById('editUrlError');
-      errorEl.classList.remove('visible');
-      document.getElementById('editShortCode').value = shortCode;
-      var btn = document.getElementById('editUrlBtn');
-      Utils.setLoading(btn, true);
-      try {
-        var response = await API.getUrlDetails(shortCode);
-        var url = response.data;
+function renderRecentClicks(clicks) {
+    const tbody = document.getElementById('recentClicksBody');
+    if (!clicks || clicks.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">No clicks yet</td></tr>'; return; }
+    tbody.innerHTML = clicks.map(click => `<tr>
+        <td><small>${Utils.timeAgo(click.clickedAt)}</small></td>
+        <td><small>${click.ipAddress || '—'}</small></td>
+        <td><small>${click.country || '—'}</small></td>
+        <td><small>${click.browserName || '—'}</small></td>
+        <td><small title="${click.referer || ''}">${click.referer ? new URL(click.referer).hostname : '—'}</small></td>
+    </tr>`).join('');
+}
+
+/* URL Editing */
+let editModalInstance = null;
+
+async function showEditModal(shortCode) {
+    const errorEl = document.getElementById('editUrlError');
+    errorEl.classList.add('d-none');
+    document.getElementById('editShortCode').value = shortCode;
+    const btn = document.getElementById('editUrlBtn');
+    Utils.setLoading(btn, true);
+    try {
+        const response = await API.getUrlDetails(shortCode);
+        const url = response.data;
         document.getElementById('editOriginalUrl').value = url.originalUrl || '';
         document.getElementById('editCustomAlias').value = url.customAlias || '';
         document.getElementById('editExpiryDays').value = '0';
-        document.getElementById('editUrlModal').classList.add('visible');
-      } catch (error) {
+        editModalInstance?.show();
+    } catch (error) {
         Utils.showToast(error.message || 'Failed to load URL details', 'error');
-      } finally {
+    } finally {
         Utils.setLoading(btn, false);
-      }
     }
+}
 
-    document.getElementById('editUrlForm')?.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      var errorEl = document.getElementById('editUrlError');
-      errorEl.classList.remove('visible');
-      var shortCode = document.getElementById('editShortCode').value;
-      var originalUrl = document.getElementById('editOriginalUrl').value.trim();
-      var customAlias = document.getElementById('editCustomAlias').value.trim();
-      var expiryDays = parseInt(document.getElementById('editExpiryDays').value);
-      var btn = document.getElementById('editUrlBtn');
-      Utils.setLoading(btn, true);
-      try {
-        var data = { originalUrl: originalUrl };
+document.getElementById('editUrlForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errorEl = document.getElementById('editUrlError');
+    errorEl.classList.add('d-none');
+    const shortCode = document.getElementById('editShortCode').value;
+    const originalUrl = document.getElementById('editOriginalUrl').value.trim();
+    const customAlias = document.getElementById('editCustomAlias').value.trim();
+    const expiryDays = parseInt(document.getElementById('editExpiryDays').value);
+    const btn = document.getElementById('editUrlBtn');
+    Utils.setLoading(btn, true);
+    try {
+        const data = { originalUrl };
         if (customAlias) data.customAlias = customAlias;
         if (expiryDays > 0) {
-          var date = new Date();
-          date.setDate(date.getDate() + expiryDays);
-          data.expiryDate = date.toISOString();
+            const date = new Date();
+            date.setDate(date.getDate() + expiryDays);
+            data.expiryDate = date.toISOString();
         }
         await API.updateUrl(shortCode, data);
-        Utils.showToast('URL updated successfully', 'success');
-        closeEditModal();
+        Utils.showToast('URL updated successfully');
+        editModalInstance?.hide();
         loadUrls();
-      } catch (error) {
+    } catch (error) {
         if (error.status === 429) {
-          Utils.showToast('Rate limit exceeded. Please wait.', 'warning');
+            Utils.showToast('Rate limit exceeded. Please wait.', 'warning');
         } else {
-          errorEl.textContent = error.message || 'Failed to update URL';
-          errorEl.classList.add('visible');
+            errorEl.textContent = error.message || 'Failed to update URL';
+            errorEl.classList.remove('d-none');
         }
-      } finally {
+    } finally {
         Utils.setLoading(btn, false);
-      }
-    });
-
-    async function showAnalytics(shortCode) {
-      document.getElementById('analyticsShortCode').value = shortCode;
-      document.getElementById('analyticsLoading').style.display = 'flex';
-      document.getElementById('analyticsContent').style.display = 'none';
-      document.getElementById('analyticsModal').classList.add('visible');
-      try {
-        var statsPromise = API.getUrlStats(shortCode);
-        var clicksPromise = API.getClickHistory(shortCode, 0, 10);
-        var results = await Promise.all([statsPromise, clicksPromise]);
-        var stats = results[0];
-        var clicks = results[1];
-        document.getElementById('analyticsTotalClicks').textContent = (stats.data && stats.data.totalClicks) || 0;
-        document.getElementById('analyticsUniqueVisitors').textContent = (stats.data && stats.data.uniqueVisitors) || 0;
-        document.getElementById('analyticsFirstClick').textContent = (stats.data && stats.data.firstClick) ? Utils.formatDate(stats.data.firstClick) : '—';
-        document.getElementById('analyticsLastClick').textContent = (stats.data && stats.data.lastClick) ? Utils.timeAgo(stats.data.lastClick) : '—';
-        renderStatTable('browsersContent', stats.data && stats.data.browsers);
-        renderStatTable('countriesContent', stats.data && stats.data.countries);
-        renderStatTable('referersContent', stats.data && stats.data.referers);
-        renderDailyContent('dailyContent', stats.data && stats.data.dailyDistribution);
-        renderRecentClicks(clicks.data && clicks.data.content || []);
-        document.getElementById('analyticsLoading').style.display = 'none';
-        document.getElementById('analyticsContent').style.display = 'block';
-        document.querySelectorAll('#analyticsTabs .tab-btn').forEach(function(t, idx) {
-          t.classList.toggle('active', idx === 0);
-        });
-        var contents = ['browsersContent', 'countriesContent', 'referersContent', 'dailyContent', 'recentClicksBody'];
-        contents.forEach(function(id, idx) {
-          document.getElementById(id).style.display = idx === 0 ? 'block' : 'none';
-        });
-      } catch (error) {
-        document.getElementById('analyticsLoading').style.display = 'none';
-        document.getElementById('analyticsContent').style.display = 'block';
-        document.getElementById('analyticsContent').innerHTML = '<div style="padding:20px;text-align:center;color:var(--accent-danger)">Failed to load analytics: ' + error.message + '</div>';
-      }
     }
+});
+</script>
 
-    function renderStatTable(containerId, entries) {
-      var container = document.getElementById(containerId);
-      if (!entries || entries.length === 0) {
-        container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-tertiary);font-size:13px">No data available</div>';
-        return;
-      }
-      var max = 0;
-      entries.forEach(function(e) { if (e.count > max) max = e.count; });
-      var html = '';
-      entries.slice(0, 10).forEach(function(entry) {
-        var pct = max > 0 ? (entry.count / max * 100) : 0;
-        html += '<div class="chart-bar">'
-          + '<span class="bar-label">' + (entry.name || 'Unknown') + '</span>'
-          + '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div>'
-          + '<span class="bar-value">' + (entry.count || 0) + '</span>'
-          + '</div>';
-      });
-      container.innerHTML = html;
-    }
-
-    function renderDailyContent(containerId, entries) {
-      var container = document.getElementById(containerId);
-      if (!entries || entries.length === 0) {
-        container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-tertiary);font-size:13px">No daily data available</div>';
-        return;
-      }
-      var max = 0;
-      entries.forEach(function(e) { if (e.clicks > max) max = e.clicks; });
-      var html = '';
-      entries.slice(-30).forEach(function(entry) {
-        var pct = max > 0 ? (entry.clicks / max * 100) : 0;
-        html += '<div class="chart-bar">'
-          + '<span class="bar-label" style="width:100px;font-size:11px">' + Utils.formatDate(entry.date) + '</span>'
-          + '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div>'
-          + '<span class="bar-value">' + (entry.clicks || 0) + '</span>'
-          + '</div>';
-      });
-      container.innerHTML = html;
-    }
-
-    function renderRecentClicks(clicks) {
-      var tbody = document.getElementById('recentClicksBody');
-      if (!clicks || clicks.length === 0) {
-        tbody.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-tertiary);font-size:13px">No clicks yet</div>';
-        return;
-      }
-      var tableHtml = '<table class="recent-clicks-table"><thead><tr><th>Time</th><th>IP</th><th>Country</th><th>Browser</th><th>Referer</th></tr></thead><tbody>';
-      clicks.forEach(function(click) {
-        var referer = click.referer || '';
-        var refererHost = '—';
-        try { if (referer) refererHost = new URL(referer).hostname; } catch(e) {}
-        tableHtml += '<tr>'
-          + '<td>' + Utils.timeAgo(click.clickedAt) + '</td>'
-          + '<td>' + (click.ipAddress || '—') + '</td>'
-          + '<td>' + (click.country || '—') + '</td>'
-          + '<td>' + (click.browserName || '—') + '</td>'
-          + '<td title="' + referer + '">' + refererHost + '</td>'
-          + '</tr>';
-      });
-      tableHtml += '</tbody></table>';
-      tbody.innerHTML = tableHtml;
-    }
-
-    document.getElementById('editUrlModal').addEventListener('click', function(e) {
-      if (e.target === this) closeEditModal();
-    });
-    document.getElementById('analyticsModal').addEventListener('click', function(e) {
-      if (e.target === this) closeAnalyticsModal();
-    });
-  </script>
 </body>
 </html>
