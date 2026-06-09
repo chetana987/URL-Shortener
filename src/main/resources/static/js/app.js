@@ -266,7 +266,7 @@ const Utils = {
         const container = document.getElementById('toastContainer');
         if (!container) return;
 
-        const bgColor = type === 'success' ? '#00cec9' : type === 'error' ? '#fd79a8' : type === 'warning' ? '#fdcb6e' : '#6c5ce7';
+        const bgColor = type === 'success' ? '#7DD3FC' : type === 'error' ? '#0EA5E9' : type === 'warning' ? '#fdcb6e' : '#38BDF8';
 
         const toast = document.createElement('div');
         toast.className = 'toast align-items-center text-white border-0 show';

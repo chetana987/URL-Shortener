@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/JWT-HS256-000000?style=flat&logo=jsonwebtokens&logoColor=white" alt="JWT HS256">
     <img src="https://img.shields.io/badge/Docker-✓-2496ED?style=flat&logo=docker&logoColor=white" alt="Docker">
     <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat" alt="License">
-    <a href="https://url-shortener-production-a9f6.up.railway.app/app/index.html"><img src="https://img.shields.io/badge/Live Demo-Railway-7C3AED?style=flat&logo=railway&logoColor=white" alt="Live Demo"></a>
+    <a href="https://url-shortener-production-a9f6.up.railway.app/app/index.html"><img src="https://img.shields.io/badge/Live Demo-Railway-38BDF8?style=flat&logo=railway&logoColor=white" alt="Live Demo"></a>
   </p>
 
   <br>
