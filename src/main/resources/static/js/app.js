@@ -266,22 +266,20 @@ const Utils = {
         const container = document.getElementById('toastContainer');
         if (!container) return;
 
-        const bgColor = type === 'success' ? '#00cec9' : type === 'error' ? '#fd79a8' : type === 'warning' ? '#fdcb6e' : '#6c5ce7';
+        const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+        const icon = icons[type] || 'ℹ';
 
         const toast = document.createElement('div');
-        toast.className = 'toast align-items-center text-white border-0 show';
-        toast.style.background = bgColor;
-        toast.style.minWidth = '280px';
+        toast.className = 'toast ' + type;
         toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
+            <span class="toast-icon">${icon}</span>
+            <span>${message}</span>
+            <button class="toast-close" onclick="this.closest('.toast').classList.add('toast-removing');setTimeout(()=>this.closest('.toast').remove(),300)">&times;</button>
         `;
 
         container.appendChild(toast);
         setTimeout(() => {
-            toast.classList.remove('show');
+            toast.classList.add('toast-removing');
             setTimeout(() => toast.remove(), 300);
         }, 4000);
     },
@@ -301,12 +299,12 @@ const Utils = {
 
     showLoading(elementId) {
         const el = document.getElementById(elementId);
-        if (el) el.classList.add('show');
+        if (el) el.style.display = 'block';
     },
 
     hideLoading(elementId) {
         const el = document.getElementById(elementId);
-        if (el) el.classList.remove('show');
+        if (el) el.style.display = 'none';
     },
 
     formatDate(dateStr) {
@@ -333,14 +331,12 @@ const Utils = {
 
     copyToClipboard(text, btn) {
         navigator.clipboard.writeText(text).then(() => {
-            const original = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            const original = btn.textContent;
+            btn.textContent = 'Copied!';
             btn.classList.add('btn-success');
-            btn.classList.remove('btn-outline-primary');
             setTimeout(() => {
-                btn.innerHTML = original;
+                btn.textContent = original;
                 btn.classList.remove('btn-success');
-                btn.classList.add('btn-outline-primary');
             }, 2000);
         }).catch(() => {
             this.showToast('Failed to copy', 'error');
@@ -355,10 +351,10 @@ const Utils = {
         const img = document.createElement('img');
         img.src = `/api/v1/qr/${shortCode}`;
         img.alt = 'QR Code';
-        img.className = 'img-fluid rounded';
         img.style.maxWidth = '200px';
+        img.style.borderRadius = '6px';
         img.onerror = () => {
-            container.innerHTML = '<p class="text-muted small">QR code unavailable</p>';
+            container.innerHTML = '<p style="color:#94A3B8;font-size:12px">QR code unavailable</p>';
         };
         container.appendChild(img);
     },
@@ -419,8 +415,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (API.isAuthenticated()) {
             const isDashboard = window.location.pathname === '/app/dashboard.html';
             authNav.innerHTML = `
-                <li class="nav-item"><a class="nav-link${isDashboard ? ' active' : ''}" href="/app/dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li class="nav-item"><a class="nav-link${isDashboard ? ' active' : ''}" href="/app/dashboard.html">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" id="logoutBtn">Logout</a></li>
             `;
             document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -431,8 +427,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } else {
             authNav.innerHTML = `
-                <li class="nav-item"><a class="nav-link" href="/app/login.html"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-                <li class="nav-item"><a class="nav-link" href="/app/signup.html"><i class="fas fa-user-plus"></i> Sign Up</a></li>
+                <li class="nav-item"><a class="nav-link" href="/app/login.html">Sign In</a></li>
+                <li class="nav-item"><a class="nav-link btn-primary-link" href="/app/signup.html">Sign Up</a></li>
             `;
         }
     }
